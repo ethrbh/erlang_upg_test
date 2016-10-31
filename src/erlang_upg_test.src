@@ -1,0 +1,17 @@
+{application, erlang_upg_test, [
+	{description, "Demonstrate Erlang/OTP application release and upgrade"},
+	{vsn, "0.0.1"},
+	{id, "git"},
+	{modules, []},
+	{registered, []},
+	{applications, [
+		kernel,
+		stdlib,
+		mnesia,
+		ssl,
+		observer,
+		runtime_tools
+	]},
+	{mod, {erlang_upg_test, []}},
+	{env, []}
+]}.

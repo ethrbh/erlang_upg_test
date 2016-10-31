@@ -1,0 +1,1 @@
+-define(DO_INFO(TEXT,TUPPLELIST), error_logger:info_report(lists:append([TEXT], lists:append(TUPPLELIST,[{module, ?MODULE}, {line, ?LINE}])))).

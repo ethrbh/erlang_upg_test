@@ -8,5 +8,8 @@ start_link() ->
 	supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
-	Procs = [],
-	{ok, {{one_for_one, 1, 5}, Procs}}.
+	SupFlags = {one_for_one,5,10},
+    Child = [{m1,
+                     {m1,start_link,[]},
+                     transient,10,worker,[m1]}],
+	{ok, {SupFlags, Child} }.
