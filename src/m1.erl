@@ -11,11 +11,13 @@
 %% ====================================================================
 -export([start_link/0, stop/0]).
 -export([ping/0, ping/2]).
+-export([get_version/0]).
 
 %% ====================================================================
 %% Behavioural functions
 %% ====================================================================
--record(state, {}).
+-record(state, {
+				version="0.0.1"}).
 
 %% ====================================================================
 %% Includes
@@ -84,6 +86,19 @@ ping(Mod, Proc) ->
 			{error, {?SERVER, "does not alive"}}
 	end.
 
+%% ====================================================================
+%% Give the version of server
+-spec get_version() -> {ok, string()} | {error, term()}.
+%% ====================================================================
+get_version() ->
+	case catch erlang:whereis(?SERVER) of
+		P when is_pid(P) ->
+			gen_server:call(P, get_version, 3000);
+			
+		_-> %% Process is not alive.
+			{error, {?SERVER, "does not alive"}}
+	end.
+
 %% init/1
 %% ====================================================================
 %% @doc <a href="http://www.erlang.org/doc/man/gen_server.html#Module:init-1">gen_server:init/1</a>
@@ -131,6 +146,9 @@ handle_call({ping, Mod, Proc}, _From, State) ->
 		Err ->
 			{reply, {error, Err}, State}
 	end;
+
+handle_call(get_version, _From, State) ->
+	{reply, {ok, State#state.version}, State};
 
 handle_call(_Request, _From, State) ->
     Reply = ok,
@@ -199,13 +217,31 @@ terminate(Reason, State) ->
 	OldVsn :: Vsn | {down, Vsn},
 	Vsn :: term().
 %% ====================================================================
-code_change(OldVsn, State, Extra) ->
-	?DO_INFO("code_change", 
+code_change({down, Vsn}, State, _Extra) ->
+	?DO_INFO("Downgrade", 
 			 [
-			 {oldVsn, OldVsn},
-			 {state, State},
-			 {extra, Extra}]),
-    {ok, State}.
+			   {module, ?MODULE},
+			   {fromVer, State#state.version},
+			   {toVer, Vsn},
+			   {extra, _Extra}
+			   ]),
+    {ok, State#state{version = Vsn}};
+code_change(Vsn, State, _Extra) ->
+	?DO_INFO("Upgrade", 
+			 [
+			   {module, ?MODULE},
+			   {fromVer, State#state.version},
+			   {toVer, Vsn},
+			   {extra, _Extra}
+			   ]),
+   {ok, State#state{version = Vsn}}.
+%% code_change(OldVsn, State, Extra) ->
+%% 	?DO_INFO("code_change", 
+%% 			 [
+%% 			 {oldVsn, OldVsn},
+%% 			 {state, State},
+%% 			 {extra, Extra}]),
+%%     {ok, State}.
 
 
 %% ====================================================================

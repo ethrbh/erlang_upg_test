@@ -1,0 +1,8 @@
+%% Current version
+{"0.0.4",
+	%% UpFromVsn - all versions 0.0.x
+ 	[{<<"0\\.0\\.[0-9]+">>, [{update, m1, {advanced, [{toVer, "0.0.3"}]}}]}],
+ 	
+ 	%% DownToVsn - all versions 0.0.x
+ 	[{<<"0\\.0\\.[0-9]+">>, [{update, m1, {advanced, [{toVer, "0.0.3"}]}}]}]
+}.
